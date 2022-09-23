@@ -1,18 +1,29 @@
 /* Imports */
-import { getBeanies } from './fetch-utils.js';
-import { renderBeanie } from './render-utils.js';
+import { getAstroSigns, getBeanies } from './fetch-utils.js';
+import { renderAstroSignOption, renderBeanie } from './render-utils.js';
 /* Get DOM Elements */
 const beanieList = document.getElementById('beanie-list');
+const astroSignSelect = document.getElementById('astro-sign-select');
 /* State */
 let beanies = [];
 let error = null;
+let astroSigns = [];
 /* Events */
 window.addEventListener('load', async () => {
     findBeanies();
+
+    const response = await getAstroSigns();
+
+    error = response.error;
+    astroSigns = response.data;
+
+    if (!error) {
+        displayAstroSignOptions();
+    }
 });
 
-async function findBeanies(name) {
-    const response = await getBeanies();
+async function findBeanies(name, astroSign) {
+    const response = await getBeanies(name, astroSign);
     error = response.error;
     beanies = response.data;
     if (!error) {
@@ -28,5 +39,16 @@ function displayBeanies() {
         beanieList.append(beanieEl);
     }
 }
+function displayNotifications() {
+    if (error) {
+        notificationDisplay.classList.add('error');
+        notificationDisplay.textContent = error.message;
+    }
+}
 
-// (don't forget to call any display functions you want to run on page load!)
+function displayAstroSignOptions() {
+    for (const astroSign of astroSigns) {
+        const option = renderAstroSignOption(astroSign);
+        astroSignSelect.append(option);
+    }
+}
