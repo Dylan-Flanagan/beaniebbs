@@ -2,6 +2,8 @@
 import { getAstroSigns, getBeanies } from './fetch-utils.js';
 import { renderAstroSignOption, renderBeanie } from './render-utils.js';
 /* Get DOM Elements */
+const notificationDisplay = document.getElementById('notification-display');
+const searchForm = document.getElementById('search-form');
 const beanieList = document.getElementById('beanie-list');
 const astroSignSelect = document.getElementById('astro-sign-select');
 /* State */
@@ -30,6 +32,11 @@ async function findBeanies(name, astroSign) {
         displayBeanies();
     }
 }
+searchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(searchForm);
+    findBeanies(formData.get('name'), formData.get('astroSign'));
+});
 /* Display Functions */
 function displayBeanies() {
     beanieList.innerHTML = '';
@@ -37,12 +44,6 @@ function displayBeanies() {
     for (const beanie of beanies) {
         const beanieEl = renderBeanie(beanie);
         beanieList.append(beanieEl);
-    }
-}
-function displayNotifications() {
-    if (error) {
-        notificationDisplay.classList.add('error');
-        notificationDisplay.textContent = error.message;
     }
 }
 
