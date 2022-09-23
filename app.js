@@ -1,15 +1,19 @@
 /* Imports */
 import { getAstroSigns, getBeanies } from './fetch-utils.js';
 import { renderAstroSignOption, renderBeanie } from './render-utils.js';
+
 /* Get DOM Elements */
 const notificationDisplay = document.getElementById('notification-display');
 const searchForm = document.getElementById('search-form');
 const beanieList = document.getElementById('beanie-list');
 const astroSignSelect = document.getElementById('astro-sign-select');
+
 /* State */
 let beanies = [];
+let count = 0;
 let error = null;
 let astroSigns = [];
+
 /* Events */
 window.addEventListener('load', async () => {
     findBeanies();
@@ -26,8 +30,12 @@ window.addEventListener('load', async () => {
 
 async function findBeanies(name, astroSign) {
     const response = await getBeanies(name, astroSign);
+
     error = response.error;
+    count = response.count;
     beanies = response.data;
+
+    displayNotifications();
     if (!error) {
         displayBeanies();
     }
@@ -37,6 +45,7 @@ searchForm.addEventListener('submit', (e) => {
     const formData = new FormData(searchForm);
     findBeanies(formData.get('name'), formData.get('astroSign'));
 });
+
 /* Display Functions */
 function displayBeanies() {
     beanieList.innerHTML = '';
@@ -44,6 +53,16 @@ function displayBeanies() {
     for (const beanie of beanies) {
         const beanieEl = renderBeanie(beanie);
         beanieList.append(beanieEl);
+    }
+}
+
+function displayNotifications() {
+    if (error) {
+        notificationDisplay.classList.add('error');
+        notificationDisplay.textContent = error.message;
+    } else {
+        notificationDisplay.classList.remove('error');
+        notificationDisplay.textContent = `Showing ${beanies.length} of ${count} found beanies`;
     }
 }
 
